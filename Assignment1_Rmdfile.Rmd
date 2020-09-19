@@ -28,3 +28,19 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+# Reading a File, Option 1: 
+
+```{r}
+library(tidyverse)
+
+health_full <- read_csv("https://chronicdata.cdc.gov/api/views/6vp6-wxuq/rows.csv?accessType=DOWNLOAD")
+```
+View(health_full)
+# Filter results to only California
+health_ca <- filter(health_full, StateAbbr == "CA")
+# Reading a File, Option 2:
+pge_19_q4_elec <- read_csv("PGE_2019_Q4_ElectricUsageByZip.csv")
+rm(pge_19_q1_elec)
+# Creating a CSV: 

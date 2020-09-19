@@ -1,0 +1,122 @@
+a <- 10*6
+a # assigned object a
+# Part A: Creating Section Headers----
+hello
+# objects: R is case sensitive ----
+A <- 67
+A
+a
+# overwriting objects ----
+a <- 2
+a 
+# naming objects ----
+1object <- 3
+!object <- 3
+-object <- 3
+object3 <- 3 # Can name this way
+my_object <- 3
+myObject <- 3
+# remove an object ----
+rm(myObject)
+
+
+# data classes ----
+12.6 # numeric 
+3 
+100
+"Male" # character
+TRUE #logical 
+FALSE 
+T 
+F
+
+# data structures: vectors, lists, matrix, data frames ----
+# vector: a series of values that are of the same data class
+c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) #generates a sequence of numbers
+c(1:10)
+c("Mon", "Tue", "Wed", "Thurs", "Fri")
+c(TRUE, TRUE, FALSE)
+# assign vectors to objects
+myVector <- c(TRUE, TRUE, FALSE)
+myVector
+numbers <- c(1:10)
+numbers
+numbers * 2
+numbers + 3
+numbers + numbers # can use object names of manipulation
+
+#list: a combination of numbers, words, and T/F
+list(1, 2, 3, "hello", FALSE)
+list(myVector, c(1, 2, 3), "hello", FALSE)
+
+
+# Subsetting vectors ----
+days <- c("Mon", "Tue", "Wed", "Thurs", "Fri")
+days
+#Extract one single element of an object 
+days[1]#Put 1 because Monday is the 1 element
+days[4]#Returns Thursday
+days[c(1, 3, 5)] #Returns Monday, Wednesday, Friday
+days[2:5] #Omits Mondays
+days[-5] #Omits Friday
+#Always use square brackets for subsetting and round brackets for functions
+
+\
+# Functions ----
+myvalues <- c(1:100)
+myvalues
+mean(myvalues)
+median(myvalues)
+min(myvalues)
+max(myvalues)
+sum(myvalues)
+sd(myvalues)
+class(myvalues)
+length(myvalues)
+log(myvalues) #this is the natural log
+log10(myvalues) #this is for log base 10
+mySqrt <- sqrt(myvalues)
+mySqrt #takes the square root of all values in the object
+?rnorm #Random normal distribution
+rnorm(100, mean = 5)
+?hist #draws a histogram
+hist(rnorm(n= 100, mean = 5))
+
+# Data frames: A series of vectors pasted together ----
+id <- c(1:200)
+group <- c(rep("Vehicle", 100), rep("Drug", 100))
+group
+response <- c(rnorm(100, mean = 25, sd = 5), 
+              rnorm(100, mean = 23, sd = 5))
+response
+myData <- data.frame(Patient = id, 
+                     Treatment = group, 
+                     Response = response)
+myData
+
+head(myData) #gives first 6 data points
+tail(myData) #gives last 6 data points
+head(myData, 10)
+tail(myData, 2)
+dim(myData) #dimensions of data
+str(myData) #structure of data
+summary(myData)
+#Subsetting Data Frames: 
+myData[1,2] #put in the row and column that you would like to know
+myData[2,3]
+myData[1:20, 2:3] #the first 20 rows for columns 2 and 3
+myData[1:20, ]#the first 20 rows and all the columns - leave columns blank
+myData[ , 1] #all rows and the 1 column 
+myData[ , "Response"]
+myData$Response #just gives the response column
+myData[myData$Response >  26, ] #all rows for which the Response is greater than 26
+myData$Positive <- myData$Response > 26 #creates a new column called Positive
+myData[myData$Treatment == "Vehicle" & myData$Response <= 23, ] #If the row is apart of the vehicle group and the response is smaller than or equal to 23, return that row
+myData[myData$Treatment == "Vehicle" | myData$Response <= 23, ] #uses or "|"
+myData[myData$Treatment != "Vehicle" & myData$Response <= 23, ] #uses does not equal "!="
+age <- round(rnorm(200, 40, 20))
+myData$Age <- age
+head(myData)
+
+# Reading Data into R ----
+pokemon <- read.csv("")
