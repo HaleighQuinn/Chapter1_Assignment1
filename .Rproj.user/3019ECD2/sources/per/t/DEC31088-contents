@@ -1,0 +1,103 @@
+---
+title: "Chapter 1, Assignment 1"
+author: "Haleigh Quinn"
+date: "`r format(Sys.Date(), '%B %d, %Y')`" #This automatically updates the date based on when you "knit". %B gives the month, %d give the two digit day of the month, and %Y gives the four digit year. 
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+# Creating Chunks ---
+ Shortcut for creating chunks: Ctrl + Alt + I
+ General Way to create chunks: "knitr" is a package that contains other functions. "opts_chunk()" is a function of knitr. 
+```{r}
+library(knitr)
+opts_chunk$set(echo=T)
+```
+ 
+
+
+# Parameters to feed into "opts_chunk$set()"
+Note: "opts_chunk$set()" sets the defaults for all subsequent chunks. If you only want to parameterize one chunk, you can enter the parameter after the bracketed "r", rather than inside the function. 
+
+"echo = T/F" : shows the code in a gray box when you render it into a web page. 
+
+"warning = F" & "message = F": prevents annoying messages from showing up on the webpage.
+
+"include = F": executes code in the background but does not show the code itself on the webpage.
+
+"eval = F": prevents code from being evaluated, but code is still visible on the webpage. 
+```{r setup, include = F} 
+knitr::opts_chunk$set(warning = F, message = F)
+
+```
+The word "setup" names the chunk. It is not necessary to name the chunk. 
+  
+# Loading Libraries Chunk
+This chunk includes all the packages that you know you will need to run the code in the rest of the script. 
+
+Example:
+```{r}
+library(tidyverse)
+library(plotly)
+library(sf)
+library(tigris)
+library(leaflet)
+library(censusapi)
+
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+
+Other things to include in this chunk: 
+- if necessary, a path variable that will allow you to share code between users who have different file paths. 
+- options(), if the packages used have special options that you need to set. 
+
+# Navigation Tips
+Ctrl+Shift+O: Opens Google Doc that is useful for navigation.
+# Steps for connecting to Github
+1. Create a repo on GitHub.com.
+
+2. Clone it on GitHub Desktop (there’s a button to initiate this from online, or within GitHub Desktop, if you’ve linked to your account, you can do File > Clone Repository and then search for it by name). This makes a copy of the repo on your personal machine, likely in an automatically created “GitHub” folder.
+
+3. In RStudio, set your working directory to this empty folder.
+
+4. Create a new .Rmd file, save it into the working directory, which would be the first observed “change” in your cloned repo.
+
+5. On GitHub Desktop, you’ll see those changes detected. Commit those changes. 
+# Publishing HTML Content 
+1. Make sure you’ve created the special username.github.io repo and have cloned it to your local machine.
+
+2. Work in RStudio on a .Rmd file that you ultimately want to showcase online.
+
+3. When ready, click Knit and generate an HTML file in your working directory. Preview it and make sure it looks the way you want.
+
+4. Copy or move the HTML file from the working directory (which would be a clone of a repo from your GitHub account) to the username.github.io folder on your machine (which is also a clone of a repo from your GitHub account, but is the “special” web hosting repo).
+
+5. In GitHub Desktop, you’ll see that changes have been detected in both the original project repo and the special web hosting repo. Commit changes to both, and push both.
+
+6. In a minute or so, you can try loading username.github.io/filename on your web browser, and you should see the same thing you had previewed.
