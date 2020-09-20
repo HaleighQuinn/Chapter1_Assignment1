@@ -1,0 +1,40 @@
+"0","library(tidyverse)"
+"0","library(sf)"
+"0","library(tigris)"
+"0","library(leaflet)"
+"0",""
+"0","#Example of grabbing all counties in California:"
+"0","ca_counties <- counties(""CA"", cb = T, progress_bar = F)"
+"2","Using FIPS code '06' for state 'CA'
+"
+"0","#Checking for a Geospatial Object: "
+"0","st_crs(ca_counties)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","NAD83"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","GEOGCRS[""NAD83"",
+    DATUM[""North American Datum 1983"",
+        ELLIPSOID[""GRS 1980"",6378137,298.257222101,
+            LENGTHUNIT[""metre"",1]]],
+    PRIMEM[""Greenwich"",0,
+        ANGLEUNIT[""degree"",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS[""latitude"",north,
+            ORDER[1],
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        AXIS[""longitude"",east,
+            ORDER[2],
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+    ID[""EPSG"",4269]]"
+"1",""
+"1","
+"

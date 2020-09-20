@@ -1,0 +1,8 @@
+"0"," #Removing Icons:"
+"0"," pge_chart %>% "
+"0","  ggplotly() %>% "
+"0","  layout("
+"0","    xaxis = list(fixedrange = T),"
+"0","    yaxis = list(fixedrange = T)"
+"0","  ) %>% "
+"0","  config(displayModeBar = F)"

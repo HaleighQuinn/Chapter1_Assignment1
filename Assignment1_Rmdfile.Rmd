@@ -1,5 +1,5 @@
 ---
-title: "Assignment1"
+title: "Chapter 1"
 author: "Haleigh Quinn"
 date: "9/18/2020"
 output: html_document
@@ -107,11 +107,426 @@ for(quarter in quarters) {
   saveRDS(pge_19_elec, "pge_19_elec.rds")
 } #saveRDS() saves the pancake at each stage of the loop. 
 View(pge_19_elec)
-# Manipulation Data: 
+# Manipulating Data - Filtering: 
 ```{r}
 library(tidyverse)
 ```
-pge_filter <- filter(pge_19_elec, CUSTOMERCLASS %in% c("Elec- Residential", "Elec- Commercial"))
+pge_filter <- 
+filter(
+  pge_19_elec, 
+  CUSTOMERCLASS %in% 
+    c(
+    "Elec- Residential", 
+    "Elec- Commercial"
+    )
+    )
+    
+    #Notes:
+  - When breaking up the function in this way, remember that functions nned to remain attached to their first open parentheses, and variable names can't be broken. 
   - %in%: "membership in"
   - c(): quickly creates vectors of elements, which, in this case, are two candidate values for CUSTOMERCLASS. 
-  - 
+  - Here, the logical expression will be TRUE if CUSTOMERCLASS contains either "Elec-Residential" or "Elec-Commercial"
+  
+# Manipulating Data - Selecting from Dataframe: 
+- select(): performed after reviewing the names() of the dataframe and deciding which columns you want to keep. 
+
+names(pge_filter)
+head(pge_filter)
+pge_filter[1,1] --> Dataframe[row, column] gives on slice of the dataframe
+pge_filter[1:5, 1:5] --> gives rows 1-5 and columns 1-5
+pge_filter[1:5, c("ZIPCODE", "MONTH", "YEAR")] --> gives rows 1-5 for columns zipcode, month, and year. 
+pge_filter[1:5, ] --> gives rows 1-5 for all columns
+pge_filter[1:5, ]$YEAR --> extracts the year column from the dataframe
+
+  #Selectively Removing: Year is unimportant because it is the same for the entire dataframe.
+  Method 1:
+  pge_select <- 
+    select(
+    pge_filter, 
+    ZIPCODE,
+    MONTH,
+    CUSTOMERCLASS,
+    COMBINED,
+    TOTALCUSTOMERS,
+    TOTALKWH,
+    AVERAGEKWH
+    )
+  Method 2: 
+  pge_select <-
+    select(
+    pge_filter, 
+    -YEAR
+    )
+    
+  #Note: Either of this methods will work, but the second is much faster. 
+  
+table(pge_select$COMBINED)
+
+Removing Year, Combined, and AverageKWH: 
+
+pge_select <- 
+  select(
+  pge_filter, 
+  !c(YEAR, COMBINED,AVERAGEKWH)
+  )
+# Manipulating Data - Aggregating Results: 
+  - group_by() and summarize(): used in conjunction with each other to create aggregated results
+  - in group_by(), you specify the columns you wany to "keep" as descrete categories while collapsing information from other fields. 
+  #Example: Don't want to retain energy data for separate ZIP codes, but do want to retain energy data for separate months and customer classes: 
+  pge_group <- 
+  group_by(
+  pge_select, 
+  MONTH, 
+  CUSTOMERCLASS
+  )
+  
+  - summarize() and mutate() allow you to create new fields of data. 
+  - summarize() collapses data based on some kind of mathematical operation, like sum(), mean(), or min(). 
+  
+  pge_summarize <- 
+  summarize(
+  pge_group, 
+  TOTALKWH = 
+  sum(
+    TOTALKWH, 
+    na.rm = T
+    )
+  )
+  - summarize() produces a new dataframe that will retain the fields that you called out in group_by()
+  - TOTALKWH is the creation of a new variable. = is used rather than <- because it is not an environment variable. 
+  - sum() takes all values of TOTALKWH from the original pge_group that have the same customer class and month and adds them together. 
+  - na.rm is an additional argument that tells sum() to ignore empty fields
+  
+# Manipulating Data - Converting to and from "tidy" data:
+  #Wider Data: Easier to look at
+  pge_wide <-
+  pivot_wider(
+  pge_summarize, 
+  names_from = CUSTOMERCLASS, 
+  values_from = TOTALKWH
+  )
+  #Longer/Tidy Data: Easier to do operations on
+  pge_tidy <- 
+  pivot_longer(
+  pge_wide, 
+  c("Elec- Commercial", "Elec- Residential"),
+  names_to = "CUSTOMERCLASS",
+  values_to= "TOTALKWH"
+  )
+
+# Manipulating Data - Summarize and Mutate function: 
+pge_summarize <-
+  summarize(
+  pge_group,
+  TOTALKWH = 
+    sum(
+      TOTALKWH, 
+      na.rm = T
+    ),
+  TOTALCUSTOMERS =
+    sum(
+      TOTALCUSTOMERS,
+      na.rm = T
+    )
+  )
+
+pge_mutate <-
+  mutate(
+    pge_summarize,
+    AVERAGEKWH =
+      TOTALKWH/TOTALCUSTOMERS
+  )
+  
+  - mutate() is like creating a new field in Excel, typing in a formula, and dragging that formula down the length of the spreadsheet. 
+  
+# Manipulating Data - Using Pipes: 
+- pipe: %>% is designed to string functions together like an assembly line where an object is passed from function to function in stages of manipulation. 
+- pipelines remove the need to specify the dataset being acted upon
+- can us ctrl+shift+M to insert a pipe
+  #Example: 
+  pge_final <-
+  pge_19_elec %>% 
+  filter(
+    CUSTOMERCLASS %in% 
+      c(
+        "Elec- Residential",
+        "Elec- Commercial"
+      )
+  ) %>% 
+  select(
+    !c(YEAR, COMBINED, AVERAGEKWH)
+  ) %>% 
+  group_by(MONTH, CUSTOMERCLASS) %>% 
+  summarize(
+    TOTALKWH = 
+      sum(
+        TOTALKWH, 
+        na.rm = T
+      ),
+    TOTALCUSTOMERS =
+      sum(
+        TOTALCUSTOMERS,
+        na.rm = T
+      )
+  ) %>% 
+  mutate(
+    AVERAGEKWH =
+      TOTALKWH/TOTALCUSTOMERS
+  )
+
+pge_final
+
+# Plots:
+- ggplots2 provides bar charts, pie charts, line charts, scatter plots, etc. 
+  #Example: Stacked bar chart
+```{r}
+library(tidyverse)
+library(plotly)
+pge_chart <-
+  pge_final %>% 
+  ggplot() +
+  geom_bar(
+    aes(
+      x = MONTH %>% factor(),
+      y = TOTALKWH,
+      fill = CUSTOMERCLASS
+    ),
+    stat = "identity",
+    position = "stack"
+  ) +
+  labs(
+    x = "Month",
+    y = "kWh",
+    title = "PG&E Territory Monthly Electricity Usage, 2019",
+    fill = "Electricity Type"
+  )
+
+pge_chart
+#Creating Interactive Plot:
+ pge_chart %>% ggplotly()
+ #Removing Icons:
+ pge_chart %>% 
+  ggplotly() %>% 
+  layout(
+    xaxis = list(fixedrange = T),
+    yaxis = list(fixedrange = T)
+  ) %>% 
+  config(displayModeBar = F)
+```
+  - aes(): standard across all kinds of plots, and should correspond to choices you would typically make in Excel. Includes x axis measure, y axis measures. 
+  - fill = : lets you specify a field with discrete options that you cna use to split your data into groups --> similar to group_by()
+  - as.factor() converts the integers in the MONTH field into discrete choices so they refer to months like January, February, etc. 
+  - stat =: lets you distinguish between "identity" and "count"
+  - position =: lets you choose between stacking the two different customer classes. "dodge" would allow you to put them side to side. 
+  - labs(): lets you specify labels. 
+  
+  #Interactive Plots: 
+  pge_chart %>% ggplotly()
+# Geospatial Data: 
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(leaflet)
+
+#Example of grabbing all counties in California:
+ca_counties <- counties("CA", cb = T, progress_bar = F)
+
+#Checking for a Geospatial Object: 
+st_crs(ca_counties)
+  #Note: EPSG should be 4269 to be joined with another sf object. 
+#Transforming EPSG codes: 
+projection <- "+proj=utm +zone=10 +ellps=GRS80 +datum=NAD83 +units=ft +no_defs"
+
+ca_counties_transformed <- 
+  ca_counties %>% 
+  st_transform(4326) %>% 
+  st_transform(26910) %>% 
+  st_transform(projection) %>% 
+  st_transform(st_crs(ca_counties))
+  #Note: In your initial set-up chunk you can instantiate "projection" and then always st_transform(projection)
+```
+- counties(): supply a state
+- cb = T: gives simplified geometries by they are roughly clipped to the shoreline. Preferred to cb = F for improved visualization. 
+- cb = F: gives the most detailed geometries available, but geometries with coastlines may have strange water portions includes. 
+- progress_bar = F: only matter for knitting to a web page. Prevents unnecessary progress outputs from being displayed. 
+
+  
+# Mapping:
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(leaflet)
+#Plotting all the counties in California:
+ggplot(ca_counties) + geom_sf()
+#Plotting interactive map of all the counties in California using leaflet:
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = ca_counties %>% 
+      st_transform(4326)
+  ) %>%
+  addMarkers(
+    data = ca_counties %>% 
+      st_centroid() %>%
+      st_transform(4326)
+  )
+  #st_centroid: used in a pipeline to convert polygons to their centroid points. 
+
+```
+
+
+
+- easiest way to map is using ggplot() + geom_sf()--> will give map in the file window
+  
+# Selecting just Bay Area Counties: 
+```{r}
+
+library(tidyverse)
+library(sf)
+library(tigris)
+library(leaflet)
+bay_county_names <-
+  c(
+    "Alameda",
+    "Contra Costa",
+    "Marin",
+    "Napa",
+    "San Francisco",
+    "San Mateo",
+    "Santa Clara",
+    "Solano",
+    "Sonoma"
+  )
+
+bay_counties <-
+  ca_counties %>%
+  filter(NAME %in% bay_county_names)
+
+ggplot(bay_counties) + geom_sf()
+
+# Demonstration of "places()" and spatial join techniques: 
+ca_cities <- places("CA", cb = T, progress_bar = FALSE)
+bay_cities <- ca_cities[bay_counties, ]
+  #these approaches still count cities that are touching the boundary of the county, but are not within the county. To remember this, you must join based on the centroids of the cities: 
+  bay_cities_within <-
+  ca_cities %>% 
+  st_centroid() %>% 
+  .[bay_counties, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(ca_cities %>% select(GEOID)) %>% 
+  st_as_sf()
+    #.[bay_counties, ] is the same as before but in a pipeline you can use a "." to indicate where the pipeline should recieve the object being passed along. 
+  #left_join() adds back the original geometry field, and keeps only the rows that match the pipeline object.
+  #select() removes redundant fields. If you select() on an SF object, it will hold onto the geometry field. This supplies left_join with two objects --> GEOID and geometry. There can only be one object supplied to left_join, so st_set_geometry(NULL) removes the geomtry from an sf object. 
+
+  #Graphed: 
+  leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = bay_counties %>% 
+      st_transform(4326),
+    fill = F,
+    weight = 2
+  ) %>%
+  addPolygons(
+    data = bay_cities %>% 
+      filter(!GEOID %in% bay_cities_within$GEOID) %>% 
+      st_transform(4326),
+    color = "red"
+  ) %>% 
+  addPolygons(
+    data = bay_cities_within %>% 
+      st_transform(4326),
+    color = "green"
+  )
+```
+
+# Census Block Groups:
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(leaflet)
+
+#New looping technique: map_dfr
+  #Faster than for loops 
+  #The contents between the curly brackets gets looped through the candidates, and the result automatically gets binded together in the dataframe. 
+bay_cbgs <- 
+  bay_county_names %>% 
+  map_dfr(function(county) {
+    block_groups("CA", county, cb = T, progress_bar = F)
+  })
+#Alternative to Tigis: Clipped Geometries from Metropolitian Transportation Commission
+bay_cbgs_clip <- st_read("https://opendata.arcgis.com/datasets/037fc1597b5a4c6994b89c46a8fb4f06_0.geojson")
+  #st_read: converts Shapefiles or GeoJSONs to sf objects
+  #st_write: allows you to export a sf object as a variety of formats. 
+
+#ZCTAs: ZIP code tabulation areas that approximate ZIP code boundaries. 
+usa_zips <- 
+  zctas(cb = T, progress_bar = F)
+
+bay_zips <-
+  usa_zips %>% 
+  st_centroid() %>% 
+  .[bay_counties, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(usa_zips %>% select(GEOID10)) %>% 
+  st_as_sf()
+
+pge_19_res_elec <-
+  pge_19_elec %>% 
+  filter(CUSTOMERCLASS == "Elec- Residential") %>% 
+  mutate(
+    ZIPCODE = ZIPCODE %>% as.character()
+  ) %>% 
+  group_by(ZIPCODE) %>% 
+  summarize(
+    TOTALKWH = sum(TOTALKWH, na.rm = T)
+  ) %>% 
+  left_join(
+    bay_zips %>% select(GEOID10),
+    by = c("ZIPCODE" = "GEOID10")
+  ) %>% 
+  st_as_sf() %>% 
+  st_transform(4326)
+class(pge_19_elec$ZIPCODE)
+#mutate(): converts zipcode from a "double" type field to a "character" type field. Character is preferred to double because character preserves leading zeros. 
+
+#The Map Illustration: 
+res_pal <- colorNumeric(
+  palette = "Blues",
+  domain = 
+    pge_19_res_elec$TOTALKWH
+)
+
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = pge_19_res_elec,
+    fillColor = ~res_pal(TOTALKWH),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.5,
+    weight = 1,
+    label = ~paste0(
+      round(TOTALKWH), 
+      " kWh total in ",
+      ZIPCODE
+    ),
+    highlightOptions = highlightOptions(
+      weight = 2,
+      opacity = 1
+    )
+  ) %>% 
+  addLegend(
+    data = pge_19_res_elec,
+    pal = res_pal,
+    values = ~TOTALKWH,
+    title = "Total Residential<br>kWh, 2019"
+  )
+  #res_pal is a color palette optimized for the range of values in TOTALKWH
+  #addPolygons gives various visual options
+```
+
