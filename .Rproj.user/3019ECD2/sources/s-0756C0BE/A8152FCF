@@ -1,0 +1,32 @@
+{
+    "id": "A8152FCF",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1600628691956.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "expression": "pge_wide",
+        "caption": "pge_wide",
+        "totalObservations": 12,
+        "displayedObservations": 12,
+        "variables": 3,
+        "cacheKey": "09D40680",
+        "object": "pge_wide",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=pge_wide&cache_key=09D40680&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 19140586183655481,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1600628691956,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,32 @@
+{
+    "id": "6462114E",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1600629171688.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "expression": "pge_mutate",
+        "caption": "pge_mutate",
+        "totalObservations": 24,
+        "displayedObservations": 24,
+        "variables": 5,
+        "cacheKey": "330A1E3F",
+        "object": "pge_mutate",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=pge_mutate&cache_key=330A1E3F&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 7143307332886346274,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1600629171688,
+    "read_only": false,
+    "read_only_alternatives": []
+}

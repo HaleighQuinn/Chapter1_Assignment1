@@ -1,0 +1,32 @@
+{
+    "id": "FFA06660",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1600628462339.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "expression": "pge_summarize",
+        "caption": "pge_summarize",
+        "totalObservations": 24,
+        "displayedObservations": 24,
+        "variables": 3,
+        "cacheKey": "89BA83B4",
+        "object": "pge_summarize",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=pge_summarize&cache_key=89BA83B4&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 7310575183467848224,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1600628462339,
+    "read_only": false,
+    "read_only_alternatives": []
+}

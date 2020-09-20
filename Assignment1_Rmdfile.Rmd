@@ -72,11 +72,11 @@ library(tidyverse)
 year <- 2019
 
 quarters <- 1:4 
-  "quarters" is the variable that holds each integer     consecutively as the script within the loop is executed 4 times. 
+  "quarters" is the variable that holds each integer consecutively as the script within the loop is executed 4 times. 
   
 type <- "Electric"
 
-pge_19_elec <- NULL
+pge_19_elec <- NULL #This creates a placeholder variable that is ready for the first iteration of the loop. 
 
 for(quarter in quarters) {
   
@@ -91,13 +91,27 @@ for(quarter in quarters) {
       "UsageByZip.csv"
     )
 
-  print(filename)
+  print(filename) 
+  #This displays the value of the filename variable 4 times in the consolue as you run the loop. 
+  #If you have to run through thousands of loops, you could use "row", and write if(row %% 100) print(row). This method only prints rows divisible by 100. 
+  #paste0() allows you to create strings fragments separated by commas, and will leave no spaces between them. 
+  
   
   temp <- read_csv(filename)
   
   pge_19_elec <- rbind(pge_19_elec,temp)
+  
   # Note rbind requires field names to be consistent for every new thing that you add.
+  rbind() stacks two dataframes that share the same column names. 
 
   saveRDS(pge_19_elec, "pge_19_elec.rds")
-}
+} #saveRDS() saves the pancake at each stage of the loop. 
 View(pge_19_elec)
+# Manipulation Data: 
+```{r}
+library(tidyverse)
+```
+pge_filter <- filter(pge_19_elec, CUSTOMERCLASS %in% c("Elec- Residential", "Elec- Commercial"))
+  - %in%: "membership in"
+  - c(): quickly creates vectors of elements, which, in this case, are two candidate values for CUSTOMERCLASS. 
+  - 

@@ -1,0 +1,278 @@
+---
+title: "Assignment1"
+author: "Haleigh Quinn"
+date: "9/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+# Reading a File, Option 1: 
+
+```{r}
+library(tidyverse)
+
+health_full <- read_csv("https://chronicdata.cdc.gov/api/views/6vp6-wxuq/rows.csv?accessType=DOWNLOAD")
+```
+View(health_full)
+# Filter results to only California
+health_ca <- filter(health_full, StateAbbr == "CA")
+# Reading a File, Option 2:
+pge_19_q4_elec <- read_csv("PGE_2019_Q4_ElectricUsageByZip.csv")
+rm(pge_19_q1_elec)
+# Saving Outputs:
+  #Creating CSV file: 
+  write_csv(health_ca, "health_ca.csv")
+  saveRDS(health_ca, "health_ca.rds")
+# Reading RDS Files: 
+  health_ca <- readRDS("health_ca.rds")
+
+# Saving Environment Variables as rda file: 
+save(health_ca, pge_19_q4_elec, file = "working_datasets.rda") 
+  You can list as many variables as you need in the save() function
+  
+  To read the rda file: load(filename)
+  load("working_datasets.rda")
+  
+# Saving the entire environment: 
+<!-- save.image("progress1.rda") --> This is now commented out so that there can be no changes made to the contents of the rda file. 
+load("progress1.rda")
+
+# For Loops: 
+For loops are written with the following structure: for(dummy_variable_name in range_of_real_objects)
+{code_to_execute}
+
+
+```{r}
+library(tidyverse)
+```
+year <- 2019
+
+quarters <- 1:4 
+  "quarters" is the variable that holds each integer consecutively as the script within the loop is executed 4 times. 
+  
+type <- "Electric"
+
+pge_19_elec <- NULL #This creates a placeholder variable that is ready for the first iteration of the loop. 
+
+for(quarter in quarters) {
+  
+  filename <- 
+    paste0(
+      "PGE_",
+      year,
+      "_Q",
+      quarter,
+      "_",
+      type,
+      "UsageByZip.csv"
+    )
+
+  print(filename) 
+  #This displays the value of the filename variable 4 times in the consolue as you run the loop. 
+  #If you have to run through thousands of loops, you could use "row", and write if(row %% 100) print(row). This method only prints rows divisible by 100. 
+  #paste0() allows you to create strings fragments separated by commas, and will leave no spaces between them. 
+  
+  
+  temp <- read_csv(filename)
+  
+  pge_19_elec <- rbind(pge_19_elec,temp)
+  
+  # Note rbind requires field names to be consistent for every new thing that you add.
+  rbind() stacks two dataframes that share the same column names. 
+
+  saveRDS(pge_19_elec, "pge_19_elec.rds")
+} #saveRDS() saves the pancake at each stage of the loop. 
+View(pge_19_elec)
+# Manipulating Data - Filtering: 
+```{r}
+library(tidyverse)
+```
+pge_filter <- 
+filter(
+  pge_19_elec, 
+  CUSTOMERCLASS %in% 
+    c(
+    "Elec- Residential", 
+    "Elec- Commercial"
+    )
+    )
+    
+    #Notes:
+  - When breaking up the function in this way, remember that functions nned to remain attached to their first open parentheses, and variable names can't be broken. 
+  - %in%: "membership in"
+  - c(): quickly creates vectors of elements, which, in this case, are two candidate values for CUSTOMERCLASS. 
+  - Here, the logical expression will be TRUE if CUSTOMERCLASS contains either "Elec-Residential" or "Elec-Commercial"
+  
+# Manipulating Data - Selecting from Dataframe: 
+- select(): performed after reviewing the names() of the dataframe and deciding which columns you want to keep. 
+
+names(pge_filter)
+head(pge_filter)
+pge_filter[1,1] --> Dataframe[row, column] gives on slice of the dataframe
+pge_filter[1:5, 1:5] --> gives rows 1-5 and columns 1-5
+pge_filter[1:5, c("ZIPCODE", "MONTH", "YEAR")] --> gives rows 1-5 for columns zipcode, month, and year. 
+pge_filter[1:5, ] --> gives rows 1-5 for all columns
+pge_filter[1:5, ]$YEAR --> extracts the year column from the dataframe
+
+  #Selectively Removing: Year is unimportant because it is the same for the entire dataframe.
+  Method 1:
+  pge_select <- 
+    select(
+    pge_filter, 
+    ZIPCODE,
+    MONTH,
+    CUSTOMERCLASS,
+    COMBINED,
+    TOTALCUSTOMERS,
+    TOTALKWH,
+    AVERAGEKWH
+    )
+  Method 2: 
+  pge_select <-
+    select(
+    pge_filter, 
+    -YEAR
+    )
+    
+  #Note: Either of this methods will work, but the second is much faster. 
+  
+table(pge_select$COMBINED)
+
+Removing Year, Combined, and AverageKWH: 
+
+pge_select <- 
+  select(
+  pge_filter, 
+  !c(YEAR, COMBINED,AVERAGEKWH)
+  )
+# Manipulating Data - Aggregating Results: 
+  - group_by() and summarize(): used in conjunction with each other to create aggregated results
+  - in group_by(), you specify the columns you wany to "keep" as descrete categories while collapsing information from other fields. 
+  #Example: Don't want to retain energy data for separate ZIP codes, but do want to retain energy data for separate months and customer classes: 
+  pge_group <- 
+  group_by(
+  pge_select, 
+  MONTH, 
+  CUSTOMERCLASS
+  )
+  
+  - summarize() and mutate() allow you to create new fields of data. 
+  - summarize() collapses data based on some kind of mathematical operation, like sum(), mean(), or min(). 
+  
+  pge_summarize <- 
+  summarize(
+  pge_group, 
+  TOTALKWH = 
+  sum(
+    TOTALKWH, 
+    na.rm = T
+    )
+  )
+  - summarize() produces a new dataframe that will retain the fields that you called out in group_by()
+  - TOTALKWH is the creation of a new variable. = is used rather than <- because it is not an environment variable. 
+  - sum() takes all values of TOTALKWH from the original pge_group that have the same customer class and month and adds them together. 
+  - na.rm is an additional argument that tells sum() to ignore empty fields
+  
+# Manipulating Data - Converting to and from "tidy" data:
+  #Wider Data: Easier to look at
+  pge_wide <-
+  pivot_wider(
+  pge_summarize, 
+  names_from = CUSTOMERCLASS, 
+  values_from = TOTALKWH
+  )
+  #Longer/Tidy Data: Easier to do operations on
+  pge_tidy <- 
+  pivot_longer(
+  pge_wide, 
+  c("Elec- Commercial", "Elec- Residential"),
+  names_to = "CUSTOMERCLASS",
+  values_to= "TOTALKWH"
+  )
+
+# Manipulating Data - Summarize and Mutate function: 
+pge_summarize <-
+  summarize(
+  pge_group,
+  TOTALKWH = 
+    sum(
+      TOTALKWH, 
+      na.rm = T
+    ),
+  TOTALCUSTOMERS =
+    sum(
+      TOTALCUSTOMERS,
+      na.rm = T
+    )
+  )
+
+pge_mutate <-
+  mutate(
+    pge_summarize,
+    AVERAGEKWH =
+      TOTALKWH/TOTALCUSTOMERS
+  )
+  
+  - mutate() is like creating a new field in Excel, typing in a formula, and dragging that formula down the length of the spreadsheet. 
+  
+# Manipulating Data - Using Pipes: 
+- pipe: %>% is designed to string functions together like an assembly line where an object is passed from function to function in stages of manipulation. 
+- pipelines remove the need to specify the dataset being acted upon
+- can us ctrl+shift+M to insert a pipe
+  #Example: 
+  pge_final <-
+  pge_19_elec %>% 
+  filter(
+    CUSTOMERCLASS %in% 
+      c(
+        "Elec- Residential",
+        "Elec- Commercial"
+      )
+  ) %>% 
+  select(
+    !c(YEAR, COMBINED, AVERAGEKWH)
+  ) %>% 
+  group_by(MONTH, CUSTOMERCLASS) %>% 
+  summarize(
+    TOTALKWH = 
+      sum(
+        TOTALKWH, 
+        na.rm = T
+      ),
+    TOTALCUSTOMERS =
+      sum(
+        TOTALCUSTOMERS,
+        na.rm = T
+      )
+  ) %>% 
+  mutate(
+    AVERAGEKWH =
+      TOTALKWH/TOTALCUSTOMERS
+  )
+
+pge_final
+
